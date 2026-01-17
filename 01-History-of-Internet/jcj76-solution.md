@@ -32,15 +32,15 @@
 
 Cerf and Kahn’s core architectural move is to treat the internetwork as something that can deliver packets across heterogeneous networks without assuming any single network guarantees reliability. Instead of forcing every underlying network to behave identically, their approach leans on a layered model: an internetwork mechanism to get packets across boundaries (via gateways), plus an end-to-end control function that can add reliability, ordering, and flow control when needed. That idea maps directly to today’s division between “best-effort delivery” (IP) and “reliability/control when you want it” (TCP, QUIC, and application-level mechanisms).
 
-What changed is the scale and threat model. The modern Internet adds massive routing infrastructure (BGP), a huge variety of access networks, and ubiquitous encryption/authentication (TLS) because the network is now hostile by default. But the fundamental trade-off still looks like the 1974 framing: reliability and control tend to be implemented end-to-end, while the internetwork layer tries to be general and simple enough to connect everything. Real-time media (calls) often chooses *timeliness over perfect delivery*, while file transfer chooses *correctness over speed*, and both behaviors are built on top of the same underlying internetwork.
+What changed is the scale and threat model. The modern Internet adds massive routing infrastructure (BGP), a huge variety of access networks, and ubiquitous encryption/authentication (TLS) because the network is now hostile by default. But the fundamental trade-off still looks like the 1974 framing: reliability and control tend to be implemented end-to-end, while the internetwork layer tries to be general and simple enough to connect everything. Real-time media (calls) often chooses timeliness over perfect delivery, while file transfer chooses correctness over speed, and both behaviors are built on top of the same underlying internetwork.
 
 ### D. Surprise Finding (4–5 sentences)
 
-I used to think video calls “just use UDP and hope for the best,” meaning there was basically no reliability involved. What surprised me is that calls often add selective reliability features *at the application layer* (like forward error correction, packet loss concealment, and jitter buffers) instead of doing heavy retransmission the way TCP does. I also learned that congestion control is still a big deal for calls—real-time apps actively adapt bitrate and resolution to avoid making congestion worse. So the main difference isn’t “reliable vs. unreliable,” it’s “what kind of reliability matters”: file transfers care about getting every byte eventually, while calls care about getting *recent* audio/video with minimal delay.
+I used to think video calls “just use UDP and hope for the best,” meaning there was basically no reliability involved. What surprised me is that calls often add selective reliability features at the application layer (like forward error correction, packet loss concealment, and jitter buffers) instead of doing heavy retransmission the way TCP does. I also learned that congestion control is still a big deal for calls—real-time apps actively adapt bitrate and resolution to avoid making congestion worse. So the main difference isn’t “reliable vs. unreliable,” it’s “what kind of reliability matters”: file transfers care about getting every byte eventually, while calls care about getting recent audio/video with minimal delay.
 
 ### E. AI Conversation Documentation (condensed transcript)
 
-Below is a condensed transcript of my conversation with an AI assistant (GPT‑5 or 4 I think). It captures the question progression and the key technical takeaways.
+Below is a condensed transcript of my conversation with an AI assistant (GitHub Copilot using GPT‑5.2). It captures the question progression and the key technical takeaways.
 
 **ME:** Why does my Zoom/Discord call sometimes freeze or drop on bad Wi‑Fi, but a file download usually finishes eventually?
 
@@ -53,10 +53,10 @@ Below is a condensed transcript of my conversation with an AI assistant (GPT‑5
 **ME:** If UDP doesn’t guarantee delivery, how do calls avoid sounding totally broken? Do they retransmit anything at all?
 
 **AI:** Calls usually try to recover in ways that don’t add much delay. Instead of retransmitting every lost packet, they may:
-- Use **jitter buffers** to smooth out variable arrival times (trading a small delay for fewer glitches).
-- Use **packet loss concealment** to “fill in” missing audio based on surrounding audio.
-- Use **forward error correction (FEC)** so some losses can be reconstructed without waiting for a resend.
-- Sometimes do **selective retransmission** only when it can arrive in time (more common in some video implementations).
+- Use jitter buffers to smooth out variable arrival times (trading a small delay for fewer glitches).
+- Use packet loss concealment to “fill in” missing audio based on surrounding audio.
+- Use forward error correction (FEC) so some losses can be reconstructed without waiting for a resend.
+- Sometimes do selective retransmission only when it can arrive in time (more common in some video implementations).
 The key idea is that “late” is almost as bad as “lost” for real-time.
 
 **ME:** You mentioned head-of-line blocking. What is that in plain terms?
@@ -82,4 +82,3 @@ The key idea is that “late” is almost as bad as “lost” for real-time.
 ## Part 3 — Reflection (4–5 sentences)
 
 The most interesting part of the paper to me is how it treats internetworking as a practical engineering problem: connecting networks that were never designed to work together, without forcing them all to become identical. My AI investigation made me realize that the “reliability problem” didn’t get solved once; instead, modern apps keep re-solving it with different priorities (perfect correctness for files vs. timely delivery for calls). The biggest change in my understanding is that many “internet problems” I experience (buffering, call glitches, bitrate drops) are not random—they’re consequences of deliberate design trade-offs. Overall, I now see the Internet less like a single technology and more like a layered system where applications pick how much ordering, recovery, and control they need.
-
